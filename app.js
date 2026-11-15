@@ -392,6 +392,7 @@
   /* ---------- Modo edición ---------- */
 
   function setAdminMode(enabled) {
+    var eraAdmin = adminMode;
     adminMode = enabled;
     document.body.classList.toggle('admin-mode', adminMode);
 
@@ -409,6 +410,15 @@
     } else if (el.dialog.open) {
       closeDialog();
     }
+
+    /* Al salir del modo edición se cierra la sesión de Firebase,
+       para que la próxima entrada vuelva a exigir la clave. */
+    if (!enabled && eraAdmin && cloud && typeof cloud.cerrarSesion === 'function') {
+      cloud.cerrarSesion().catch(function (err) {
+        console.warn('No se pudo cerrar la sesión de administración:', err);
+      });
+    }
+
     render();
   }
 
